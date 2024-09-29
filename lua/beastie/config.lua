@@ -1,17 +1,17 @@
--- lua/beastie/config.lua
-local M = {}
+local config = {}
 
-M.default_config = {
+config.default_config = {
   frames = {
     "🐱", "😺", "😸", "😹", "😼", "😽"
   },
   animation_speed = 200, -- ms
+  start_at_launch = true,
 }
 
-M.options = {}
+config.options = {}
 
-function M.setup(opts)
-  M.options = vim.tbl_deep_extend("force", {}, M.default_config, opts or {})
+function config.setup(opts)
+  config.options = vim.tbl_deep_extend("force", {}, config.options, opts or {})
 end
 
-return M
+return config

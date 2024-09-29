@@ -1,4 +1,5 @@
 local ui = require('beastie.ui')
+local log = require('beastie.log')
 local beastie = {}
 
 local config, frame_idx, buf, win, window_opts, timer
@@ -28,12 +29,14 @@ local function change_beastie_position()
 end
 
 local function start_beastie()
+  log.info("Starting beastie ...")
   if timer then timer:stop() end
   timer = vim.loop.new_timer()
   timer:start(0, config.animation_speed, vim.schedule_wrap(change_beastie_position))
 end
 
 local function stop_beastie()
+  log.info("Stopping beastie ...")
   if timer then
     timer:stop(); timer = nil
   end

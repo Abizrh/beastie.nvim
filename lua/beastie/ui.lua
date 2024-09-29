@@ -1,40 +1,28 @@
-local config = require('beastie.config')
--- @return table
-local function createBufferOpts()
+local UI = {}
+
+---@param initial_frame string
+function UI.create_buffer_ui(initial_frame)
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, { initial_frame })
+
   local opts = {
     relative = 'editor',
-    width = 3,
+    width = 2,
     height = 1,
     row = 5,
     col = 5,
     style = 'minimal'
   }
-  return opts
+
+  local win = vim.api.nvim_open_win(buf, false, opts)
+  return buf, win, opts
 end
 
-local function createBufferUi()
-  local buffer = vim.api.nvim_create_buf(false, true)
-  -- apply_buffer_keymaps(buffer)
-  return buffer
-end
-
-
----@class BeastieUI
----@field buffer integer
----@field buffer_opts table
-local UI = {}
-UI.buffer = createBufferUi()
-UI.buffer_opts = createBufferOpts()
-
----@param beastie Beastie
-function UI.updateUI(beastie)
-  UI.buffer_opts.col = UI.buffer_opts.col + 1
-  if UI.buffer_opts.col > vim.o.columns - 5 then
-    UI.buffer_opts.col = 5
+function UI.update_beastie(buf, win, opts, new_frame)
+  if vim.api.nvim_buf_is_valid(buf) and vim.api.nvim_win_is_valid(win) then
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, { new_frame })
+    vim.api.nvim_win_set_config(win, opts)
   end
-
-  vim.api.nvim_buf_set_lines(UI.buffer, 0, -1, false, { config.options.frames[beastie.frame_index] })
-  vim.api.nvim_open_win(UI.buffer, false, UI.buffer_opts)
 end
 
 return UI

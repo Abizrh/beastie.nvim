@@ -1,5 +1,6 @@
 local ui = require('beastie.ui')
 local log = require('beastie.log')
+local uv = require('beastie.uv')
 local beastie = {}
 
 local config, frame_idx, buf, win, window_opts, timer
@@ -31,7 +32,7 @@ end
 local function start_beastie()
   log.info("Starting beastie ...")
   if timer then timer:stop() end
-  timer = vim.loop.new_timer()
+  timer = uv.new_timer()
   timer:start(0, config.animation_speed, vim.schedule_wrap(change_beastie_position))
 end
 
@@ -56,14 +57,18 @@ local function initialize(opts)
   frame_idx = 1
 end
 
+local function register_cmds()
+  vim.api.nvim_create_user_command('BeastieStart', start_beastie, {})
+  vim.api.nvim_create_user_command('BeastieStop', stop_beastie, {})
+end
+
 ---@class BeastieOpts
 ---@field frames string[]
 ---@field start_at_launch boolean
 ---@field animation_speed number
 function beastie.setup(opts)
   initialize(opts)
-  vim.api.nvim_create_user_command('BeastieStart', start_beastie, {})
-  vim.api.nvim_create_user_command('BeastieStop', stop_beastie, {})
+  register_cmds()
   if config.start_at_launch then
     vim.defer_fn(start_beastie, 1000)
   end

@@ -1,6 +1,11 @@
 # 🐱 beastie.nvim
 A fun and lightweight Neovim plugin that brings emoji as your bastie's while coding.
 
+
+https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
+
+
+
 ## Usage
 
 ### Lazy

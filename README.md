@@ -8,7 +8,7 @@ A fun and lightweight Neovim plugin that brings emoji as your bastie's while cod
 ```lua
   {
     "Abizrh/beastie.nvim",
-    lazy = false, -- needed so the beastie can start at launch
+    lazy = false, -- needed so the your beastie can start at launch
     opts = {
       frames = {
         "🐱",

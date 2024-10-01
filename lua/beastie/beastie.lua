@@ -1,13 +1,24 @@
 local ui = require('beastie.ui')
 local log = require('beastie.log')
 local uv = require('beastie.uv')
-local beastie = {}
 
+local beastie = {}
 local config, frame_idx, buf, win, window_opts, timer
+
+---@class BeastieSet
+---@field frames string[]
+---@field name string
+
+---@class BeastieOpts
+---@field beasties BeastieSet[]
+---@field start_at_launch boolean
+---@field animation_speed number
+---@field active_beastie number
 
 local function change_beastie_position()
   if not buf or not win then
-    buf, win, window_opts = ui.create_buffer_ui(config.frames[frame_idx])
+    local active_set = config.beasties[config.active_beastie]
+    buf, win, window_opts = ui.create_buffer_ui(active_set.frames[frame_idx])
   end
 
   local direction = math.random(4) -- 1: left, 2: right, 3: up, 4: down
@@ -23,10 +34,10 @@ local function change_beastie_position()
     window_opts.row = math.min(vim.o.lines - 2, window_opts.row + step)
   end
 
-  -- select random frame
-  frame_idx = math.random(#config.frames)
-
-  ui.update_beastie(buf, win, window_opts, config.frames[frame_idx])
+  -- select random frame from active set
+  local active_set = config.beasties[config.active_beastie]
+  frame_idx = math.random(#active_set.frames)
+  ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
 end
 
 local function start_beastie()
@@ -50,22 +61,42 @@ end
 ---@param opts BeastieOpts
 local function initialize(opts)
   config = vim.tbl_deep_extend("force", {
-    frames = { "🐱", "😺", "😸", "😹", "😼", "😽" },
+    beasties = {
+      {
+        name = "cat",
+        frames = { "🐱", "😺", "😸", "😹", "😼", "😽" }
+      },
+    },
     start_at_launch = false,
     animation_speed = 200,
+    active_beastie = 1
   }, opts or {})
   frame_idx = 1
+end
+
+local function switch_beastie(index)
+  if index > 0 and index <= #config.beasties then
+    config.active_beastie = index
+    frame_idx = 1
+    if buf and win then
+      -- Update the existing beastie if it's already running
+      local active_set = config.beasties[config.active_beastie]
+      ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
+    end
+    log.info("Switched to beastie set: " .. config.beasties[index].name)
+  else
+    log.error("Invalid beastie index")
+  end
 end
 
 local function register_cmds()
   vim.api.nvim_create_user_command('BeastieStart', start_beastie, {})
   vim.api.nvim_create_user_command('BeastieStop', stop_beastie, {})
+  vim.api.nvim_create_user_command('BeastieSwitch', function(opts)
+    switch_beastie(tonumber(opts.args))
+  end, { nargs = 1 })
 end
 
----@class BeastieOpts
----@field frames string[]
----@field start_at_launch boolean
----@field animation_speed number
 function beastie.setup(opts)
   initialize(opts)
   register_cmds()

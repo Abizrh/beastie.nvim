@@ -6,7 +6,7 @@ https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
 
 
 
-## Usage
+## Installation
 
 ### Lazy
 
@@ -36,6 +36,16 @@ https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
   },
 ```
 
+
+## Usage
+
+| Command               | Description                                             |
+| --------------------- | ------------------------------------------------------- |
+| `:BeastieStart`      | Start your Beastie                               |
+| `:BeastieStop`       | Stop your Beastie                                |
+| `:BeastieSwitch 2`         | Switch to a specific beastie [given index] |
+
+
 ## Configuration
 
 | Option | Type | Default | Description |
@@ -44,15 +54,6 @@ https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
 | animation_speed | number | 200 | The speed of the animation |
 | start_at_launch | boolean | false | Start the animation at launch |
 | active_beastie | number | 1 | The index of the active beastie |
-
-
-## CMD
-
-| Command               | Description                                             |
-| --------------------- | ------------------------------------------------------- |
-| `:BeastieStart`      | Start your Beastie                               |
-| `:BeastieStop`       | Stop your Beastie                                |
-| `:BeastieSwitch [index]`         | Switch to a specific beastie [given index] |
 
 ## License
 

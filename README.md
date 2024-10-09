@@ -61,6 +61,3 @@ https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
 | start_at_launch | boolean | false | Start the animation at launch |
 | active_beastie | number | 1 | The index of the active beastie |
 
-## License
-
-MIT

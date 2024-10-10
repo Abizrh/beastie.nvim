@@ -6,6 +6,7 @@ config.default_config = {
   },
   animation_speed = 200, -- ms
   start_at_launch = true,
+  animation = "random" --options -> "random" | "cursor"
 }
 
 config.options = {}

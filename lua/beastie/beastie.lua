@@ -35,8 +35,6 @@ local function keep_within_vicinity(cursor_pos)
     if dy > vicinity_radius then
       window_opts.row = cursor_pos[1] - 1 + math.random(-vicinity_radius, vicinity_radius)
     end
-
-    window_opts.row = math.max(2, math.min(window_opts.row, vim.o.lines - 10))
   end
 end
 
@@ -60,7 +58,6 @@ local function change_beastie_position()
 
   window_opts.col = cursor_pos[2] + math.random(-vicinity_radius, vicinity_radius)
   window_opts.row = cursor_pos[1] - 1 + math.random(-vicinity_radius, vicinity_radius)
-
 
   local active_set = config.beasties[config.active_beastie]
   frame_idx = math.random(#active_set.frames)

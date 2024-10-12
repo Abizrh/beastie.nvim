@@ -37,7 +37,8 @@ https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
       },
       start_at_launch = true,
       animation_speed = 200, -- ms
-      active_beastie = 1, -- 
+      active_beastie = "cat", -- 
+      animation = "random", -- "cursor"
     },
   },
 ```
@@ -49,7 +50,7 @@ https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
 | --------------------- | ------------------------------------------------------- |
 | `:BeastieStart`      | Start your Beastie                               |
 | `:BeastieStop`       | Stop your Beastie                                |
-| `:BeastieSwitch 2`         | Switch to a specific beastie [given index] |
+| `:BeastieSwitch name`         | Switch to a specific beastie [given name] |
 
 
 ## Configuration
@@ -59,5 +60,6 @@ https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
 | beastie | table | { {name = 'cat', frames = {'🐱', '😺', '😸', '😹', '😼', '😽'}} } | The list of beasties to choose from |
 | animation_speed | number | 200 | The speed of the animation |
 | start_at_launch | boolean | false | Start the animation at launch |
-| active_beastie | number | 1 | The index of the active beastie |
+| active_beastie | string | "cat" | The name of the active beastie |
+| animation | "random" or "cursor" | "random" | Type of animation to use |
 

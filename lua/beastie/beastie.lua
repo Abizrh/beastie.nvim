@@ -4,7 +4,6 @@ local uv = require("beastie.uv")
 
 local beastie = {}
 local config, frame_idx, buf, win, window_opts, timer
-local move_timer = nil
 
 local vicinity_radius = 2 -- max distance from cursor
 local last_cursor_pos = { 0, 0 }
@@ -47,7 +46,7 @@ local function detect_cursor_jump(cursor_pos)
 
   if math.abs(dx) > jump_threshold or math.abs(dy) > jump_threshold then
     window_opts.col = cursor_pos[2] + math.random(-vicinity_radius, vicinity_radius)
-    window_opts.row = math.max(0, cursor_pos[1] - 1 + math.random(-vicinity_radius, vicinity_radius)) 
+    window_opts.row = math.max(0, cursor_pos[1] - 1 + math.random(-vicinity_radius, vicinity_radius))
   end
 end
 
@@ -57,8 +56,7 @@ local function change_beastie_position()
     buf, win, window_opts = ui.create_buffer_ui(active_set.frames[frame_idx])
   end
 
-  local cursor_pos = vim.api.nvim_win_get_cursor(0) 
-
+  local cursor_pos = vim.api.nvim_win_get_cursor(0)
 
   window_opts.col = cursor_pos[2] + math.random(-vicinity_radius, vicinity_radius)
   window_opts.row = cursor_pos[1] - 1 + math.random(-vicinity_radius, vicinity_radius)
@@ -67,7 +65,6 @@ local function change_beastie_position()
   local active_set = config.beasties[config.active_beastie]
   frame_idx = math.random(#active_set.frames)
   ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
-
 
   last_cursor_pos = { cursor_pos[1], cursor_pos[2] }
 end
@@ -87,9 +84,8 @@ end
 
 local function stop_beastie()
   log.info("Stopping beastie ...")
-  if move_timer then
-    move_timer:stop()
-    move_timer = nil
+  if timer then
+    timer:stop(); timer = nil
   end
   if buf and vim.api.nvim_buf_is_valid(buf) then
     vim.api.nvim_buf_delete(buf, { force = true })
@@ -111,7 +107,7 @@ local function initialize(opts)
     },
     start_at_launch = false,
     animation_speed = 200,
-    animation = "random", 
+    animation = "random",
     active_beastie = 1,
   }, opts or {})
   frame_idx = 1

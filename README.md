@@ -61,5 +61,5 @@ https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
 | animation_speed | number | 200 | The speed of the animation |
 | start_at_launch | boolean | false | Start the animation at launch |
 | active_beastie | string | "cat" | The name of the active beastie |
-| animation | "random" or "cursor" | "random" | Type of animation to use |
+| animation | `random` or `cursor` | "random" | Type of animation to use |
 

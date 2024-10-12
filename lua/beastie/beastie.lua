@@ -54,16 +54,33 @@ local function change_beastie_position()
     buf, win, window_opts = ui.create_buffer_ui(active_set.frames[frame_idx])
   end
 
-  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+  if config.animation == "cursor" then
+    local cursor_pos = vim.api.nvim_win_get_cursor(0)
 
-  window_opts.col = cursor_pos[2] + math.random(-vicinity_radius, vicinity_radius)
-  window_opts.row = cursor_pos[1] - 1 + math.random(-vicinity_radius, vicinity_radius)
+    window_opts.col = cursor_pos[2] + math.random(-vicinity_radius, vicinity_radius)
+    window_opts.row = cursor_pos[1] - 1 + math.random(-vicinity_radius, vicinity_radius)
+
+    last_cursor_pos = { cursor_pos[1], cursor_pos[2] }
+  end
+
+  if config.animation == "random" then
+    local direction = math.random(4) -- 1: left, 2: right, 3: up, 4: down
+    local step = math.random(1, 3)   -- Move 1 to 3 steps at a time
+
+    if direction == 1 then           -- Move left
+      window_opts.col = math.max(0, window_opts.col - step)
+    elseif direction == 2 then       -- Move right
+      window_opts.col = math.min(vim.o.columns - 3, window_opts.col + step)
+    elseif direction == 3 then       -- Move up
+      window_opts.row = math.max(0, window_opts.row - step)
+    else                             -- Move down
+      window_opts.row = math.min(vim.o.lines - 2, window_opts.row + step)
+    end
+  end
 
   local active_set = config.beasties[config.active_beastie]
   frame_idx = math.random(#active_set.frames)
   ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
-
-  last_cursor_pos = { cursor_pos[1], cursor_pos[2] }
 end
 
 local function start_beastie()
@@ -110,17 +127,18 @@ local function initialize(opts)
   frame_idx = 1
 end
 
-local function switch_beastie(index)
-  if index > 0 and index <= #config.beasties then
-    config.active_beastie = index
-    frame_idx = 1
-    if buf and win then
-      local active_set = config.beasties[config.active_beastie]
-      ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
+local function switch_beastie(name)
+  for i, set in ipairs(config.beasties) do
+    if set.name == name then
+      config.active_beastie = i
+      frame_idx = 1
+      if buf and win then
+        local active_set = config.beasties[config.active_beastie]
+        ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
+      end
+      log.info("Switched to beastie set: " .. config.beasties[i].name)
+      return
     end
-    log.info("Switched to beastie set: " .. config.beasties[index].name)
-  else
-    log.error("Invalid beastie index")
   end
 end
 
@@ -128,7 +146,7 @@ local function register_cmds()
   vim.api.nvim_create_user_command("BeastieStart", start_beastie, {})
   vim.api.nvim_create_user_command("BeastieStop", stop_beastie, {})
   vim.api.nvim_create_user_command("BeastieSwitch", function(opts)
-    switch_beastie(tonumber(opts.args))
+    switch_beastie(opts.args)
   end, { nargs = 1 })
 end
 

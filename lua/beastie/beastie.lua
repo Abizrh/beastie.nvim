@@ -18,7 +18,17 @@ local jump_threshold = 5
 ---@field start_at_launch boolean
 ---@field animation_speed number
 ---@field animation string
----@field active_beastie number
+---@field active_beastie number|string
+
+local function find_beastie_index(name)
+  for i, set in ipairs(config.beasties) do
+    if set.name == name then
+      return i
+    end
+  end
+  log.error("Beastie '" .. name .. "' not found!")
+  return 1
+end
 
 local function keep_within_vicinity(cursor_pos)
   if not window_opts then
@@ -49,17 +59,34 @@ local function detect_cursor_jump(cursor_pos)
 end
 
 local function change_beastie_position()
-  if not buf or not win then
-    local active_set = config.beasties[config.active_beastie]
+  if not config then
+    log.error("Configuration not initialized")
+    return
+  end
+
+  local active_index = type(config.active_beastie) == "string"
+      and find_beastie_index(config.active_beastie)
+      or config.active_beastie
+
+  local active_set = config.beasties[active_index]
+  if not active_set then
+    log.error("Invalid active beastie index")
+    return
+  end
+
+  if not buf or not win or not window_opts then
+    frame_idx = frame_idx or 1
     buf, win, window_opts = ui.create_buffer_ui(active_set.frames[frame_idx])
+    if not buf or not win or not window_opts then
+      log.error("Failed to create buffer UI")
+      return
+    end
   end
 
   if config.animation == "cursor" then
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
-
     window_opts.col = cursor_pos[2] + math.random(-vicinity_radius, vicinity_radius)
     window_opts.row = cursor_pos[1] - 1 + math.random(-vicinity_radius, vicinity_radius)
-
     last_cursor_pos = { cursor_pos[1], cursor_pos[2] }
   end
 
@@ -78,9 +105,10 @@ local function change_beastie_position()
     end
   end
 
-  local active_set = config.beasties[config.active_beastie]
-  frame_idx = math.random(#active_set.frames)
-  ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
+  if active_set and #active_set.frames > 0 then
+    frame_idx = math.random(#active_set.frames)
+    ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
+  end
 end
 
 local function start_beastie()
@@ -99,7 +127,8 @@ end
 local function stop_beastie()
   log.info("Stopping beastie ...")
   if timer then
-    timer:stop(); timer = nil
+    timer:stop()
+    timer = nil
   end
   if buf and vim.api.nvim_buf_is_valid(buf) then
     vim.api.nvim_buf_delete(buf, { force = true })
@@ -122,24 +151,31 @@ local function initialize(opts)
     start_at_launch = false,
     animation_speed = 200,
     animation = "random",
-    active_beastie = 1,
+    active_beastie = 'cat',
   }, opts or {})
+
+  if type(config.active_beastie) == "string" then
+    config.active_beastie = find_beastie_index(config.active_beastie)
+  end
+
   frame_idx = 1
 end
 
 local function switch_beastie(name)
-  for i, set in ipairs(config.beasties) do
-    if set.name == name then
-      config.active_beastie = i
-      frame_idx = 1
-      if buf and win then
-        local active_set = config.beasties[config.active_beastie]
-        ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
-      end
-      log.info("Switched to beastie set: " .. config.beasties[i].name)
-      return
-    end
+  if not config or not config.beasties then
+    log.error("Configuration not initialized")
+    return
   end
+
+  local new_index = find_beastie_index(name)
+  config.active_beastie = new_index
+  frame_idx = 1
+
+  if buf and win then
+    local active_set = config.beasties[new_index]
+    ui.update_beastie(buf, win, window_opts, active_set.frames[frame_idx])
+  end
+  log.info("Switched to beastie set: " .. name)
 end
 
 local function register_cmds()
@@ -160,6 +196,7 @@ end
 
 vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI", "WinScrolled" }, {
   callback = function()
+    if not config then return end
     local cursor_pos = vim.api.nvim_win_get_cursor(0)
     if config.animation == "cursor" and window_opts then
       keep_within_vicinity(cursor_pos)

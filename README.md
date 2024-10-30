@@ -4,7 +4,7 @@
   <img src="https://dotfyle.com/plugins/Abizrh/beastie.nvim/shield" />
 </a>
 <br/>
-A fun and lightweight Neovim plugin that brings emoji as your bastie's while coding.
+A fun and lightweight Neovim plugin that brings emoji as your beastie while coding.
 
 
 
@@ -37,8 +37,8 @@ https://github.com/user-attachments/assets/ca2db35e-6ae5-45f2-87ef-9c4c9458ee78
       },
       start_at_launch = true,
       animation_speed = 200, -- ms
-      active_beastie = "cat", -- 
-      animation = "random", -- "cursor"
+      active_beastie = "cat", 
+      animation = "random", -- "cursor" | "random"
     },
   },
 ```

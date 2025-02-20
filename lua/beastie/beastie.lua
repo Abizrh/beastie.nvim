@@ -30,6 +30,10 @@ local function find_beastie_index(name)
   return 1
 end
 
+local function open_cage()
+  ui.create_buffer_cage_ui()
+end
+
 local function keep_within_vicinity(cursor_pos)
   if not window_opts then
     return
@@ -78,30 +82,24 @@ local function change_beastie_position()
     frame_idx = frame_idx or 1
     buf, win, window_opts = ui.create_buffer_ui(active_set.frames[frame_idx])
     if not buf or not win or not window_opts then
-      log.error("Failed to create buffer UI")
+      log.error("Failed to create buffer ui")
       return
     end
-  end
-
-  if config.animation == "cursor" then
-    local cursor_pos = vim.api.nvim_win_get_cursor(0)
-    window_opts.col = cursor_pos[2] + math.random(-vicinity_radius, vicinity_radius)
-    window_opts.row = cursor_pos[1] - 1 + math.random(-vicinity_radius, vicinity_radius)
-    last_cursor_pos = { cursor_pos[1], cursor_pos[2] }
   end
 
   if config.animation == "random" then
     local direction = math.random(4) -- 1: left, 2: right, 3: up, 4: down
     local step = math.random(1, 3)   -- Move 1 to 3 steps at a time
 
-    if direction == 1 then           -- Move left
-      window_opts.col = math.max(0, window_opts.col - step)
-    elseif direction == 2 then       -- Move right
-      window_opts.col = math.min(vim.o.columns - 3, window_opts.col + step)
-    elseif direction == 3 then       -- Move up
-      window_opts.row = math.max(0, window_opts.row - step)
-    else                             -- Move down
-      window_opts.row = math.min(vim.o.lines - 2, window_opts.row + step)
+    -- only move in cage boundaries
+    if direction == 1 then     -- Move left
+      window_opts.col = math.max(ui.cage_bounds.col_min, window_opts.col - step)
+    elseif direction == 2 then -- Move right
+      window_opts.col = math.min(ui.cage_bounds.col_max, window_opts.col + step)
+    elseif direction == 3 then -- Move up
+      window_opts.row = math.max(ui.cage_bounds.row_min, window_opts.row - step)
+    else                       -- Move down
+      window_opts.row = math.min(ui.cage_bounds.row_max, window_opts.row + step)
     end
   end
 
@@ -113,6 +111,7 @@ end
 
 local function start_beastie()
   log.info("Starting beastie ...")
+  open_cage()
   if timer then
     timer:stop()
   end
@@ -136,7 +135,16 @@ local function stop_beastie()
   if win and vim.api.nvim_win_is_valid(win) then
     vim.api.nvim_win_close(win, true)
   end
+
+  if ui.cage_buf and vim.api.nvim_buf_is_valid(ui.cage_buf) then
+    vim.api.nvim_buf_delete(ui.cage_buf, { force = true })
+  end
+  if ui.cage_win and vim.api.nvim_win_is_valid(ui.cage_win) then
+    vim.api.nvim_win_close(ui.cage_win, true)
+  end
+
   buf, win = nil, nil
+  ui.cage_buf, ui.cage_win = nil, nil
 end
 
 ---@param opts BeastieOpts
@@ -177,6 +185,7 @@ local function switch_beastie(name)
   end
   log.info("Switched to beastie set: " .. name)
 end
+
 
 local function register_cmds()
   vim.api.nvim_create_user_command("BeastieStart", start_beastie, {})

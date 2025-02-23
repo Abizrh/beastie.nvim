@@ -37,20 +37,22 @@ end
 function UI.create_buffer_cage_ui()
   local buf = vim.api.nvim_create_buf(false, true)
   local win_width = vim.api.nvim_win_get_width(0)
-  local right_col = win_width - 50 -- 50 is your window width
-  local cage_width = 55
+  local right_col = win_width - 37
+  local cage_width = 37
   local cage_height = 50
   local cage_row = 10
   local cage_col = right_col
 
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
-    "",
-    "  ██████  ███████  █████  ███████ ████████ ██ ███████",
-    "  ██   ██ ██      ██   ██ ██         ██    ██ ██     ",
-    "  ██████  █████   ███████ ███████    ██    ██ █████  ",
-    "  ██   ██ ██      ██   ██      ██    ██    ██ ██     ",
-    "  ██████  ███████ ██   ██ ███████    ██    ██ ███████",
-    "🐱",
+    " ================================== ",
+    " ",
+    " ▗▄▄▖ ▗▄▄▄▖ ▗▄▖  ▗▄▄▖▗▄▄▄▖▗▄▄▄▖▗▄▄▄▖",
+    " ▐▌ ▐▌▐▌   ▐▌ ▐▌▐▌     █    █  ▐▌   ",
+    " ▐▛▀▚▖▐▛▀▀▘▐▛▀▜▌ ▝▀▚▖  █    █  ▐▛▀▀ ",
+    " ▐▙▄▞▘▐▙▄▄▖▐▌ ▐▌▗▄▄▞▘  █  ▗▄█▄▖▐▙▄▄ ",
+    " ",
+    "                             v1.2.0 ",
+    " ================================== ",
   })
   local win = vim.api.nvim_open_win(buf, true, {
     relative = 'win',
@@ -65,10 +67,10 @@ function UI.create_buffer_cage_ui()
   UI.cage_buf = buf
   UI.cage_win = win
   UI.cage_bounds = {
-    row_min = cage_row + 1,
-    row_max = cage_row + cage_height - 2,
-    col_min = cage_col + 1,
-    col_max = cage_col + cage_width - 3,
+    row_min = cage_row + 4,
+    row_max = cage_row + cage_height - 6,
+    col_min = cage_col + 4,
+    col_max = cage_col + cage_width - 9,
   }
 end
 
